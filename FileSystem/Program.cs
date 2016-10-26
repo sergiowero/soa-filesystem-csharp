@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileSystem {
-    class Program {
-        static void Main(string[] args) {
+namespace FileSystem
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            FileSystem filesystem = new FileSystem();
+            filesystem.Start();
         }
     }
 }
