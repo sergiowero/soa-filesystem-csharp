@@ -131,7 +131,7 @@ namespace FileSystem
         {
             foreach (var node in m_currentNode.children)
             {
-                Console.WriteLine(" " + node.Key);
+                Console.WriteLine(string.Format(" {0,-20}{1}", node.Key, node.Value.PrintPermissions()));
             }
             return true;
         }

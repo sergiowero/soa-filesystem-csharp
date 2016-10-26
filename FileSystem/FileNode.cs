@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +8,9 @@ using System.Threading.Tasks;
 namespace FileSystem
 {
     [Serializable]
-    public class FileNode : IComparable<FileNode>
+    public class FileNode : IComparable<FileNode>, IEnumerable<FileNode>
     {
-        public const short DEFAULT_PERMISSIONS = 0x01FF;
+        public const short DEFAULT_PERMISSIONS = 0x01E4;
 
         public enum Type
         {
@@ -59,9 +60,35 @@ namespace FileSystem
             return string.Compare(this.relativePath, other.relativePath);
         }
 
+        public string PrintPermissions()
+        {
+            byte u = (byte)(0x07 & (permissions >> 6));
+            byte g = (byte)(0x07 & (permissions >> 3));
+            byte a = (byte)(0x07 & (permissions >> 0));
+            return string.Format("{0}{1}{2}{3}", type == Type.Directory ? "d": "-", Permit(u), Permit(g), Permit(a));
+        }
+
+        private string Permit(byte _value)
+        {
+            string permit = (_value & 0x4) != 0 ? "r" : "-";
+            permit       += (_value & 0x2) != 0 ? "w" : "-";
+            permit       += (_value & 0x1) != 0 ? 'x' : '-';
+            return permit;
+        }
+
         public override string ToString()
         {
             return absolutePath;
+        }
+
+        public IEnumerator<FileNode> GetEnumerator()
+        {
+            foreach (var item in children) yield return item.Value;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return children.GetEnumerator();
         }
     }
 }
