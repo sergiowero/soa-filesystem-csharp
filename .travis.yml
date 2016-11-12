@@ -1,0 +1,3 @@
+language: csharp
+solution: FileSystem/FileSystem.sln
+mono: 2.10.8
