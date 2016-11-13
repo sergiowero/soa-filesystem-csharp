@@ -9,12 +9,15 @@ namespace FileSystem
         Both
     }
 
+    public delegate bool CommandDelegate(string _param);
+
     public class Command
     {
-        public Func<string, bool> callback { get; private set; }
+
+        public CommandDelegate callback { get; private set; }
         public CommandType type { get; private set; }
 
-        public Command(Func<string, bool> _callback, CommandType _type)
+        public Command(CommandDelegate _callback, CommandType _type)
         {
             callback = _callback;
             type = _type;
