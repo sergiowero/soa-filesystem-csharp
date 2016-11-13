@@ -1,20 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FileSystem
 {
-    using Command = Tuple<Func<string, bool>, CommandType>;
-
-    public enum CommandType
-    {
-        System,
-        File,
-        Both
-    }
-
     public class FileSystem
     {
         private const string FILESYSTEM_FILE = "files.dat";
@@ -56,7 +47,6 @@ namespace FileSystem
 
             if (File.Exists(FILESYSTEM_FILE))
             {
-
                 FileStream fs = new FileStream(FILESYSTEM_FILE, FileMode.Open);
                 try
                 {
@@ -163,19 +153,19 @@ namespace FileSystem
                 {
                     var param = tokens.Length > 1 ? tokens[1] : "";
                     Command cmd = m_commands[tokens[0]];
-                    if (cmd.Item2 == CommandType.System && inFileMode)
+                    if (cmd.type == CommandType.System && inFileMode)
                     {
                         LogInfo("Command \"{0}\" cannot be used when a file is open.\n", tokens[0]);
                     }
-                    else if (cmd.Item2 == CommandType.File && !inFileMode)
+                    else if (cmd.type == CommandType.File && !inFileMode)
                     {
                         LogInfo("Command \"{0}\" cannot be used without a open file.\n", tokens[0]);
                     }
                     else
                     {
-                        check = cmd.Item1(param);
+                        check = cmd.callback(param);
                     }
-                    
+
                     Console.WriteLine();
                 }
                 else
@@ -290,7 +280,6 @@ namespace FileSystem
         {
             var node = m_currentNode[_name];
 
-
             if (node == null)
             {
                 LogError("Directory \"" + _name + "\" does not exist. You can only delete child directories.");
@@ -343,8 +332,6 @@ namespace FileSystem
             {
                 LogError("\"" + _name + "\" not found.");
             }
-
-
 
             return true;
         }
