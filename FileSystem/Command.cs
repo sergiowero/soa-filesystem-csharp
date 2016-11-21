@@ -1,26 +1,12 @@
-﻿using System;
-
-namespace FileSystem
+﻿namespace FileSystem
 {
-    public enum CommandType
+    public abstract class Command
     {
-        System,
-        File,
-        Both
-    }
+        public FileSystem fileSystem;
 
-    public delegate bool CommandDelegate(string _param);
+        public virtual bool saveSystemAfterExecute { get { return false; } }
+        public virtual bool saveSettingsAfterExecute { get { return false; } }
 
-    public class Command
-    {
-
-        public CommandDelegate callback { get; private set; }
-        public CommandType type { get; private set; }
-
-        public Command(CommandDelegate _callback, CommandType _type)
-        {
-            callback = _callback;
-            type = _type;
-        }
+        public abstract bool Execute(params string[] _args);
     }
 }

@@ -44,14 +44,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
+    <Compile Include="Commands\ChangeDirectoryCommand.cs" />
+    <Compile Include="Commands\ClearCommand.cs" />
+    <Compile Include="Commands\EmptyCommand.cs" />
+    <Compile Include="Commands\ExitCommand.cs" />
+    <Compile Include="Commands\ListCommand.cs" />
+    <Compile Include="Commands\MakeDirectoryCommand.cs" />
+    <Compile Include="Commands\RemoveCommand.cs" />
+    <Compile Include="Commands\RemoveDirectoryCommand.cs" />
     <Compile Include="FileNode.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SysLog.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Compile Include="Commands\TouchCommand.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

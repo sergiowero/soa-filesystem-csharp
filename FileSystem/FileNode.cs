@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileSystem
 {
@@ -52,7 +49,6 @@ namespace FileSystem
             byte a = (byte)(0x07 & _all);
 
             permissions = (short)((u << 6) | (g << 3) | (a));
-
         }
 
         public int CompareTo(FileNode other)
@@ -65,14 +61,14 @@ namespace FileSystem
             byte u = (byte)(0x07 & (permissions >> 6));
             byte g = (byte)(0x07 & (permissions >> 3));
             byte a = (byte)(0x07 & (permissions >> 0));
-            return string.Format("{0}{1}{2}{3}", type == Type.Directory ? "d": "-", Permit(u), Permit(g), Permit(a));
+            return string.Format("{0}{1}{2}{3}", type == Type.Directory ? "d" : "-", Permit(u), Permit(g), Permit(a));
         }
 
         private string Permit(byte _value)
         {
             string permit = (_value & 0x4) != 0 ? "r" : "-";
-            permit       += (_value & 0x2) != 0 ? "w" : "-";
-            permit       += (_value & 0x1) != 0 ? 'x' : '-';
+            permit += (_value & 0x2) != 0 ? "w" : "-";
+            permit += (_value & 0x1) != 0 ? 'x' : '-';
             return permit;
         }
 
