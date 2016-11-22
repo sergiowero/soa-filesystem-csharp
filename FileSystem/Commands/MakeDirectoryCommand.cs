@@ -1,4 +1,5 @@
-﻿namespace FileSystem.Commands
+﻿using System;
+namespace FileSystem.Commands
 {
     public class MakeDirectoryCommand : Command
     {
@@ -26,6 +27,8 @@
                 relativePath = name,
                 permissions = FileNode.DEFAULT_PERMISSIONS,
                 type = FileNode.Type.Directory,
+                creationTime = DateTime.Now.ToBinary(),
+                modificationTime = DateTime.Now.ToBinary(),
                 size = 0
             };
 

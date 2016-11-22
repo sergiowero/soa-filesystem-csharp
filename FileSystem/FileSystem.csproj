@@ -46,6 +46,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="Commands\ChangeDirectoryCommand.cs" />
     <Compile Include="Commands\ClearCommand.cs" />
+    <Compile Include="Commands\CopyCommand.cs" />
     <Compile Include="Commands\EmptyCommand.cs" />
     <Compile Include="Commands\ExitCommand.cs" />
     <Compile Include="Commands\ListCommand.cs" />

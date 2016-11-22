@@ -8,7 +8,7 @@ namespace FileSystem.Commands
         {
             foreach (var node in fileSystem.currentNode.children)
             {
-                Console.WriteLine(string.Format(" {0,-30}{1}", node.Key, node.Value.PrintPermissions()));
+                Console.WriteLine(string.Format(" {0,-30}  {1:-40}  {2}", node.Key, node.Value.PrintTime(), node.Value.PrintPermissions()));
             }
             return true;
         }

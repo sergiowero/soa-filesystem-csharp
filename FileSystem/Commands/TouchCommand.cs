@@ -1,4 +1,6 @@
-﻿namespace FileSystem.Commands
+﻿using System;
+
+namespace FileSystem.Commands
 {
     public class TouchCommand : Command
     {
@@ -16,7 +18,8 @@
             FileNode file = fileSystem.FindNode(name, fileSystem.currentNode);
             if (file != null)
             {
-                SysLog.LogError("File \"{0}\" already exist.", name);
+                //SysLog.LogError("File \"{0}\" already exist.", name);
+                file.modificationTime = DateTime.Now.ToBinary();
                 return true;
             }
 
@@ -46,6 +49,8 @@
                 relativePath = fileName,
                 permissions = FileNode.DEFAULT_PERMISSIONS,
                 type = FileNode.Type.File,
+                creationTime = DateTime.Now.ToBinary(),
+                modificationTime = DateTime.Now.ToBinary(),
                 size = 0
             };
 

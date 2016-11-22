@@ -22,6 +22,8 @@ namespace FileSystem
         public long size;
         public short permissions;
         public SortedDictionary<string, FileNode> children;
+        public long creationTime;
+        public long modificationTime;
 
         public FileNode()
         {
@@ -70,6 +72,14 @@ namespace FileSystem
             permit += (_value & 0x2) != 0 ? "w" : "-";
             permit += (_value & 0x1) != 0 ? 'x' : '-';
             return permit;
+        }
+
+        public string PrintTime()
+        {
+            string creation = DateTime.FromBinary(creationTime).ToString("dd/MM/yyyy hh:mm");
+            string modification = DateTime.FromBinary(modificationTime).ToString("dd/MM/yyyy hh:mm");
+
+            return string.Format("c: {0:-15} m: {1:-15}", creation, modification);
         }
 
         public override string ToString()

@@ -79,6 +79,8 @@ namespace FileSystem
                     relativePath = "/",
                     permissions = FileNode.DEFAULT_PERMISSIONS,
                     type = FileNode.Type.Directory,
+                    creationTime = DateTime.Now.ToBinary(),
+                    modificationTime = DateTime.Now.ToBinary(),
                     size = 0
                 };
                 m_root["."] = m_root;
