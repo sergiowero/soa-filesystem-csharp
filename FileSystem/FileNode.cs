@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FileSystem
 {
@@ -24,6 +25,7 @@ namespace FileSystem
         public SortedDictionary<string, FileNode> children;
         public long creationTime;
         public long modificationTime;
+        public MemoryStream memoryHandle;
 
         public FileNode()
         {
