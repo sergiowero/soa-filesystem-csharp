@@ -12,13 +12,10 @@ namespace FileSystem
         private const string FILESYSTEM_FILE = "files.dat";
         private const string SETTINGS_FILE = "settings.txt";
 
-        private bool inFileMode { get { return m_openedFileName != null; } }
-
         private Dictionary<string, Command> m_commands;
         public FileNode currentNode;
         private FileNode m_root;
         public Dictionary<string, string> settings;
-        private MemoryStream m_openedFile;
         private string m_openedFileName;
 
         public FileSystem()
@@ -29,7 +26,6 @@ namespace FileSystem
 
             m_commands = new Dictionary<string, Command>();
             settings = new Dictionary<string, string>();
-            m_openedFile = null;
             m_openedFileName = null;
 
             m_commands["quit"] = new ExitCommand();
@@ -81,8 +77,7 @@ namespace FileSystem
                     permissions = FileNode.DEFAULT_PERMISSIONS,
                     type = FileNode.Type.Directory,
                     creationTime = DateTime.Now.ToBinary(),
-                    modificationTime = DateTime.Now.ToBinary(),
-                    size = 0
+                    modificationTime = DateTime.Now.ToBinary()
                 };
                 m_root["."] = m_root;
                 m_root[".."] = m_root;
@@ -152,10 +147,7 @@ namespace FileSystem
             bool check = true;
             while (check)
             {
-                if (m_openedFileName != null)
-                    Console.Write("File:" + m_openedFileName + " >> ");
-                else
-                    Console.Write(currentNode.absolutePath + " >> ");
+                Console.Write(currentNode.absolutePath + " >> ");
 
                 string command = Console.ReadLine();
                 var tokens = command.Split(' ', '\t', '\n', '\r');
@@ -242,7 +234,7 @@ namespace FileSystem
         {
             FileNode file = FindNode(name, currentNode);
 
-            if(file == null)
+            if (file == null)
             {
                 //Find parent node
                 FileNode parent = null;
@@ -271,69 +263,23 @@ namespace FileSystem
                     permissions = FileNode.DEFAULT_PERMISSIONS,
                     type = FileNode.Type.File,
                     creationTime = DateTime.Now.ToBinary(),
-                    modificationTime = DateTime.Now.ToBinary(),
-                    size = 0
+                    modificationTime = DateTime.Now.ToBinary()
                 };
 
                 parent[fileName] = file;
-                file.memoryHandle = new MemoryStream();
+                file.Open();
                 return file;
             }
             else
             {
-                file.memoryHandle = new MemoryStream();
-                file.memoryHandle.Write(file.data, 0, file.data.Length);
+                file.Open();
                 return file;
             }
         }
 
-        public void Close()
+        public void Close(FileNode _file)
         {
-
-        }
-
-        private bool OpenFile(string _name)
-        {
-            if (m_openedFile != null)
-            {
-                SysLog.LogError("There is already a file previously opened ({0}). You cannot open two files at once.", m_openedFileName);
-                return true;
-            }
-
-            FileNode file = FindNode(_name, currentNode);
-
-            if (file == null)
-            {
-                SysLog.LogError("File \"{0}\" does not exist", _name);
-                return true;
-            }
-
-            if (file.type == FileNode.Type.Directory)
-            {
-                SysLog.LogError("File \"{0}\" is a directory");
-                return true;
-            }
-
-            m_openedFile = new MemoryStream();
-            m_openedFileName = file.relativePath;
-
-            return true;
-        }
-
-        private bool CloseFile(string _)
-        {
-            if (m_openedFile != null)
-            {
-                m_openedFile.Close();
-                m_openedFile = null;
-                m_openedFileName = null;
-            }
-            else
-            {
-                SysLog.LogError("There is not a opened file. You need to open a file to close it!!!");
-            }
-
-            return true;
+            _file.Close();
         }
     }
 }

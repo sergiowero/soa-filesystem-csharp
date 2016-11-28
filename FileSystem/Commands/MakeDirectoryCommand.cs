@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace FileSystem.Commands
 {
     public class MakeDirectoryCommand : Command
@@ -28,8 +29,7 @@ namespace FileSystem.Commands
                 permissions = FileNode.DEFAULT_PERMISSIONS,
                 type = FileNode.Type.Directory,
                 creationTime = DateTime.Now.ToBinary(),
-                modificationTime = DateTime.Now.ToBinary(),
-                size = 0
+                modificationTime = DateTime.Now.ToBinary()
             };
 
             newDir["."] = newDir;

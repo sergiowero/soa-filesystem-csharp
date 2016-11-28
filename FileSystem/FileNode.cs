@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace FileSystem
 {
@@ -19,13 +20,15 @@ namespace FileSystem
         public Type type;
         public string absolutePath;
         public string relativePath;
-        public byte[] data;
-        public long size;
+        public byte[] data { get; private set; }
+        public long size { get { return data != null ? data.Length : 0; } }
         public short permissions;
         public SortedDictionary<string, FileNode> children;
         public long creationTime;
         public long modificationTime;
-        public MemoryStream memoryHandle;
+        private MemoryStream memoryHandle;
+
+        public bool isOpen { get { return memoryHandle != null; } }
 
         public FileNode()
         {
@@ -97,6 +100,32 @@ namespace FileSystem
         IEnumerator IEnumerable.GetEnumerator()
         {
             return children.GetEnumerator();
+        }
+
+        public void Open()
+        {
+            data = data ?? new byte[0];
+            memoryHandle = new MemoryStream();
+            memoryHandle.Write(data, 0, data.Length);
+            modificationTime = DateTime.Now.ToBinary();
+        }
+
+        public void Write(string _data)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(_data);
+            memoryHandle.Write(data, 0, data.Length);
+        }
+
+        public void Flush()
+        {
+            memoryHandle.Flush();
+            data = memoryHandle.ToArray();
+        }
+
+        public void Close()
+        {
+            Flush();
+            memoryHandle = null;
         }
     }
 }

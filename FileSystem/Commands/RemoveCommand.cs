@@ -31,7 +31,7 @@
             }
             else
             {
-                parent   = fileSystem.FindNode(name.Substring(0, index + 1), fileSystem.currentNode);
+                parent = fileSystem.FindNode(name.Substring(0, index + 1), fileSystem.currentNode);
                 fileName = name.Substring(index + 1);
             }
 

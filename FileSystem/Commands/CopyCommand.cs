@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace FileSystem.Commands
+﻿namespace FileSystem.Commands
 {
     public class CopyCommand : Command
     {
@@ -9,7 +6,7 @@ namespace FileSystem.Commands
 
         public override bool Execute(params string[] _args)
         {
-            if(_args.Length < 2)
+            if (_args.Length < 2)
             {
                 SysLog.LogError("Insuficient arguments");
                 return true;
