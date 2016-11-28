@@ -180,14 +180,6 @@ namespace FileSystem
             }
         }
 
-        public bool FindNode(string _name)
-        {
-            bool res = FindNode(_name, currentNode) != null;
-            Console.WriteLine(" Found => " + res);
-
-            return res;
-        }
-
         public FileNode FindNode(string _name, FileNode _current = null)
         {
             FileNode result = null;
