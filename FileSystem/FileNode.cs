@@ -116,6 +116,11 @@ namespace FileSystem
             memoryHandle.Write(data, 0, data.Length);
         }
 
+        public void Write(byte[] _data)
+        {
+            memoryHandle.Write(_data, 0, _data.Length);
+        }
+
         public void Flush()
         {
             memoryHandle.Flush();

@@ -1,6 +1,6 @@
 ﻿namespace FileSystem.Commands
 {
-    public class CopyCommand : Command
+    public class MoveCommand : Command
     {
         public override bool saveSystemAfterExecute { get { return true; } }
 
@@ -33,6 +33,7 @@
             destinFile = fileSystem.Open(destin);
             destinFile.Write(sourceFile.data);
             fileSystem.Close(destinFile);
+            fileSystem.Remove(source);
 
             return true;
         }

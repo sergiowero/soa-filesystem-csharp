@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FileSystem.Commands
+﻿namespace FileSystem.Commands
 {
     public class TouchCommand : Command
     {

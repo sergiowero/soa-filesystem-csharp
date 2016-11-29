@@ -41,6 +41,7 @@ namespace FileSystem
             m_commands["touch"] = new TouchCommand();
             m_commands["rm"] = new RemoveCommand();
             m_commands["cp"] = new CopyCommand();
+            m_commands["mv"] = new MoveCommand();
             //m_commands["open"] = new Command(OpenFile, CommandType.System);
             //m_commands["close"] = new Command(CloseFile, CommandType.File);
 
@@ -150,7 +151,7 @@ namespace FileSystem
                 Console.Write(currentNode.absolutePath + " >> ");
 
                 string command = Console.ReadLine();
-                var tokens = command.Split(' ', '\t', '\n', '\r');
+                var tokens = command.Trim().Split(' ', '\t', '\n', '\r');
                 if (m_commands.ContainsKey(tokens[0]))
                 {
                     string[] args = new string[0];
@@ -272,6 +273,38 @@ namespace FileSystem
         public void Close(FileNode _file)
         {
             _file.Close();
+        }
+
+        public void Remove(string _name)
+        {
+            FileNode file = FindNode(_name, currentNode);
+            if (file == null)
+            {
+                SysLog.LogError("File \"{0}\" does not exist.", _name);
+                return;
+            }
+
+            //Find parent node
+            FileNode parent = null;
+            string fileName = null;
+            int index = _name.LastIndexOf('/');
+            if (index == -1)
+            {
+                parent = currentNode;
+                fileName = _name;
+            }
+            else
+            {
+                parent = FindNode(_name.Substring(0, index + 1), currentNode);
+                fileName = _name.Substring(index + 1);
+            }
+
+            if (parent == null || string.IsNullOrEmpty(fileName) || parent.type == FileNode.Type.File)
+            {
+                SysLog.LogError("Path \"{0}\" is invalid.", _name);
+            }
+
+            parent.children.Remove(fileName);
         }
     }
 }
