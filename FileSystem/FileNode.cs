@@ -112,19 +112,40 @@ namespace FileSystem
 
         public void Write(string _data)
         {
-            byte[] data = Encoding.UTF8.GetBytes(_data);
-            memoryHandle.Write(data, 0, data.Length);
+            if (memoryHandle != null)
+            {
+                byte[] data = Encoding.UTF8.GetBytes(_data);
+                memoryHandle.Write(data, 0, data.Length);
+            }
+        }
+
+        public string Read()
+        {
+            if (memoryHandle != null)
+            {
+                return Encoding.UTF8.GetString(memoryHandle.ToArray());
+            }
+            else
+            {
+                return "";
+            }
         }
 
         public void Write(byte[] _data)
         {
-            memoryHandle.Write(_data, 0, _data.Length);
+            if (memoryHandle != null)
+            {
+                memoryHandle.Write(_data, 0, _data.Length);
+            }
         }
 
         public void Flush()
         {
-            memoryHandle.Flush();
-            data = memoryHandle.ToArray();
+            if (memoryHandle != null)
+            {
+                memoryHandle.Flush();
+                data = memoryHandle.ToArray();
+            }
         }
 
         public void Close()

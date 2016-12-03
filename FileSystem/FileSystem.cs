@@ -42,6 +42,8 @@ namespace FileSystem
             m_commands["rm"] = new RemoveCommand();
             m_commands["cp"] = new CopyCommand();
             m_commands["mv"] = new MoveCommand();
+            m_commands["write"] = new WriteCommand();
+            m_commands["cat"] = new CatCommand();
             //m_commands["open"] = new Command(OpenFile, CommandType.System);
             //m_commands["close"] = new Command(CloseFile, CommandType.File);
 
