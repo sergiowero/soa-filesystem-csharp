@@ -73,12 +73,11 @@ namespace FileSystem
 
             if (m_root == null)
             {
-                m_root = new FileNode()
+                m_root = new FileNode(FileNode.Type.Directory)
                 {
                     absolutePath = "/",
                     relativePath = "/",
                     permissions = FileNode.DEFAULT_PERMISSIONS,
-                    type = FileNode.Type.Directory,
                     creationTime = DateTime.Now.ToBinary(),
                     modificationTime = DateTime.Now.ToBinary()
                 };
@@ -251,12 +250,11 @@ namespace FileSystem
                     SysLog.LogError("Path \"{0}\" is invalid.", name);
                 }
 
-                file = new FileNode()
+                file = new FileNode(FileNode.Type.File)
                 {
                     absolutePath = parent.absolutePath + fileName,
                     relativePath = fileName,
                     permissions = FileNode.DEFAULT_PERMISSIONS,
-                    type = FileNode.Type.File,
                     creationTime = DateTime.Now.ToBinary(),
                     modificationTime = DateTime.Now.ToBinary()
                 };

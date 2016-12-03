@@ -14,10 +14,11 @@ namespace FileSystem
         public enum Type
         {
             Directory,
-            File
+            File,
+            Device
         }
 
-        public Type type;
+        public Type type { get; private set; }
         public string absolutePath;
         public string relativePath;
         public byte[] data { get; private set; }
@@ -26,13 +27,14 @@ namespace FileSystem
         public SortedDictionary<string, FileNode> children;
         public long creationTime;
         public long modificationTime;
-        private MemoryStream memoryHandle;
+        protected MemoryStream memoryHandle;
 
         public bool isOpen { get { return memoryHandle != null; } }
 
-        public FileNode()
+        public FileNode(Type _type)
         {
             children = new SortedDictionary<string, FileNode>();
+            type = _type;
         }
 
         public FileNode this[string key]
@@ -102,7 +104,7 @@ namespace FileSystem
             return children.GetEnumerator();
         }
 
-        public void Open()
+        public virtual void Open()
         {
             data = data ?? new byte[0];
             memoryHandle = new MemoryStream();
@@ -110,7 +112,7 @@ namespace FileSystem
             modificationTime = DateTime.Now.ToBinary();
         }
 
-        public void Write(string _data)
+        public virtual void Write(string _data)
         {
             if (memoryHandle != null)
             {
@@ -119,7 +121,7 @@ namespace FileSystem
             }
         }
 
-        public string Read()
+        public virtual string ReadAll()
         {
             if (memoryHandle != null)
             {
@@ -128,6 +130,14 @@ namespace FileSystem
             else
             {
                 return "";
+            }
+        }
+
+        public virtual void Read(byte[] _buff, int offset, int count)
+        {
+            if(memoryHandle != null && _buff != null)
+            {
+                memoryHandle.Read(_buff, offset, count);
             }
         }
 

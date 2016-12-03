@@ -17,7 +17,7 @@ namespace FileSystem.Commands
 
             FileNode file = fileSystem.Open(name);
             Console.WriteLine();
-            Console.WriteLine(file.Read());
+            Console.WriteLine(file.ReadAll());
             fileSystem.Close(file);
             
             return true;

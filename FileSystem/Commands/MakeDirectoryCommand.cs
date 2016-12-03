@@ -22,12 +22,11 @@ namespace FileSystem.Commands
                 return true;
             }
 
-            var newDir = new FileNode()
+            var newDir = new FileNode(FileNode.Type.Directory)
             {
                 absolutePath = fileSystem.currentNode.absolutePath + name + "/",
                 relativePath = name,
                 permissions = FileNode.DEFAULT_PERMISSIONS,
-                type = FileNode.Type.Directory,
                 creationTime = DateTime.Now.ToBinary(),
                 modificationTime = DateTime.Now.ToBinary()
             };
