@@ -47,6 +47,7 @@
     <Compile Include="Commands\CatCommand.cs" />
     <Compile Include="Commands\ChangeDirectoryCommand.cs" />
     <Compile Include="Commands\ClearCommand.cs" />
+    <Compile Include="Commands\MakeDeviceCommand.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Commands\CopyCommand.cs" />
     <Compile Include="Commands\EmptyCommand.cs" />

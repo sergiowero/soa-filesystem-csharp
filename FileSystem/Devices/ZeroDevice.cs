@@ -2,6 +2,7 @@
 
 namespace FileSystem.Devices
 {
+    [Serializable]
     public class ZeroDevice : FileNode
     {
 

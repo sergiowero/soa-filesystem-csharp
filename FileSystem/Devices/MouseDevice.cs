@@ -16,7 +16,7 @@ namespace FileSystem.Devices
             this.Y = y;
         }
     }
-
+    [Serializable]
     public class MouseDevice : FileNode
     {
         [DllImport("user32.dll")]

@@ -15,10 +15,13 @@ namespace FileSystem.Commands
             }
             string name = _args[0];
 
-            FileNode file = fileSystem.Open(name);
-            Console.WriteLine();
-            Console.WriteLine(file.ReadAll());
-            fileSystem.Close(file);
+            FileNode file = fileSystem.Open(name, false);
+            if (file != null)
+            {
+                Console.WriteLine();
+                Console.WriteLine(file.ReadAll());
+                fileSystem.Close(file);
+            }
             
             return true;
         }

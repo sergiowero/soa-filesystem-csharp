@@ -1,4 +1,5 @@
 ﻿using FileSystem.Commands;
+using FileSystem.Devices;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +17,6 @@ namespace FileSystem
         public FileNode currentNode;
         private FileNode m_root;
         public Dictionary<string, string> settings;
-        private string m_openedFileName;
 
         public FileSystem()
         {
@@ -26,7 +26,6 @@ namespace FileSystem
 
             m_commands = new Dictionary<string, Command>();
             settings = new Dictionary<string, string>();
-            m_openedFileName = null;
 
             m_commands["quit"] = new ExitCommand();
             m_commands["exit"] = new ExitCommand();
@@ -44,6 +43,7 @@ namespace FileSystem
             m_commands["mv"] = new MoveCommand();
             m_commands["write"] = new WriteCommand();
             m_commands["cat"] = new CatCommand();
+            m_commands["mkdev"] = new MakeDeviceCommand();
             //m_commands["open"] = new Command(OpenFile, CommandType.System);
             //m_commands["close"] = new Command(CloseFile, CommandType.File);
 
@@ -224,12 +224,18 @@ namespace FileSystem
             return result;
         }
 
-        public FileNode Open(string name)
+        public FileNode Open(string name, bool _createIfNotExist=true)
         {
             FileNode file = FindNode(name, currentNode);
 
             if (file == null)
             {
+                if(!_createIfNotExist)
+                {
+                    SysLog.LogError("File {0} does not exist", name);
+                    return null;
+                }
+
                 //Find parent node
                 FileNode parent = null;
                 string fileName = null;
@@ -305,6 +311,64 @@ namespace FileSystem
             }
 
             parent.children.Remove(fileName);
+        }
+
+        public void CreateDeviceFile(string _name, string _type)
+        {
+            FileNode file = FindNode(_name, currentNode);
+
+            if (file == null)
+            {
+                //Find parent node
+                FileNode parent = null;
+                string fileName = null;
+                int index = _name.LastIndexOf('/');
+                if (index == -1)
+                {
+                    parent = currentNode;
+                    fileName = _name;
+                }
+                else
+                {
+                    parent = FindNode(_name.Substring(0, index + 1), currentNode);
+                    fileName = _name.Substring(index + 1);
+                }
+
+                if (parent == null || string.IsNullOrEmpty(fileName) || parent.type == FileNode.Type.File)
+                {
+                    SysLog.LogError("Path \"{0}\" is invalid.", _name);
+                }
+
+                switch(_type)
+                {
+                    case "zero":
+                        file = new ZeroDevice()
+                        {
+                            absolutePath = parent.absolutePath + fileName,
+                            relativePath = fileName,
+                            permissions = FileNode.DEFAULT_PERMISSIONS,
+                            creationTime = DateTime.Now.ToBinary(),
+                            modificationTime = DateTime.Now.ToBinary()
+                        };
+                        break;
+                    case "mouse":
+                        file = new MouseDevice()
+                        {
+                            absolutePath = parent.absolutePath + fileName,
+                            relativePath = fileName,
+                            permissions = FileNode.DEFAULT_PERMISSIONS,
+                            creationTime = DateTime.Now.ToBinary(),
+                            modificationTime = DateTime.Now.ToBinary()
+                        };
+                        break;
+                    default:
+                        SysLog.LogError("Device type {0} does not exist", _type);
+                        break;
+                }
+
+                parent[fileName] = file;
+                
+            }
         }
     }
 }

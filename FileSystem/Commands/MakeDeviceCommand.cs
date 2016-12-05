@@ -1,30 +1,26 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace FileSystem.Commands
 {
-    public class WriteCommand :  Command
+    public class MakeDeviceCommand : Command
     {
         public override bool saveSystemAfterExecute { get { return true; } }
 
         public override bool Execute(params string[] _args)
         {
-            if (_args.Length < 2)
+            if (_args.Length == 0)
             {
                 SysLog.LogError("Not enought arguments");
                 return true;
             }
             string name = _args[0];
-            FileNode file = fileSystem.Open(name, false);
+            string type = _args[1];
 
-            if (file != null)
-            {
-
-                string data = string.Join(" ", _args, 1, _args.Length - 1);
-
-                file.Write(data);
-
-                fileSystem.Close(file);
-            }
-            
+            fileSystem.CreateDeviceFile(name, type);
             return true;
         }
     }
