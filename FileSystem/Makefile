@@ -1,4 +1,4 @@
-all: FileSystem.exe
+all: FileSystem
 
 
 SOURCES=Command.cs FileNode.cs FileSystem.cs Program.cs SysLog.cs $(wildcard Commands/*.cs) $(wildcard Devices/*.cs) Properties/AssemblyInfo.cs
@@ -6,5 +6,5 @@ SOURCES=Command.cs FileNode.cs FileSystem.cs Program.cs SysLog.cs $(wildcard Com
 lib: 
 	mkdir lib
 
-FileSystem.exe: $(SOURCES)  lib
-	mcs $(SOURCES) -out:lib/FileSystem
+FileSystem: $(SOURCES)  lib
+	mcs $(SOURCES) -out:lib/FileSystem -define:LINUX
