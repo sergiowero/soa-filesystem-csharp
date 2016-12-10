@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace FileSystem.Devices
 {
@@ -19,8 +21,36 @@ namespace FileSystem.Devices
     [Serializable]
     public class MouseDevice : FileNode
     {
+#if WINDOWS
         [DllImport("user32.dll")]
         static extern bool GetCursorPos(out POINT lpPoint);
+#endif
+
+#if LINUX
+        private void GetCursorPos(out POINT lpPoint)
+        {
+            lpPoint = new POINT();
+
+            Process proc = new Process();
+            proc.StartInfo.FileName = "xdotool";
+            proc.StartInfo.Arguments = "getmouselocation";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.RedirectStandardError = true;
+            proc.StartInfo.RedirectStandardInput = true;
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.Start();
+            string output = proc.StandardOutput.ReadToEnd();
+            // output example
+            // x:852 y:689 screen:0 window:37748742
+            Regex r = new Regex(@"^x:(?<x>\d+)\sy:(?<y>\d+)", RegexOptions.None);
+            Match m = r.Match(output);
+            if (m.Success)
+            {
+                lpPoint.X = int.Parse(m.Result("${x}"));
+                lpPoint.Y = int.Parse(m.Result("${y}"));
+            }
+        }
+#endif
 
         public MouseDevice() :base(Type.Device)
         {
