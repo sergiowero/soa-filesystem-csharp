@@ -56,6 +56,7 @@
     <Compile Include="Commands\MakeDirectoryCommand.cs" />
     <Compile Include="Commands\RemoveCommand.cs" />
     <Compile Include="Commands\RemoveDirectoryCommand.cs" />
+    <Compile Include="Commands\AppendCommand.cs" />
     <Compile Include="Commands\WriteCommand.cs" />
     <Compile Include="Devices\MouseDevice.cs" />
     <Compile Include="Devices\ZeroDevice.cs" />

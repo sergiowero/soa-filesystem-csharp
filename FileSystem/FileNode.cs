@@ -25,12 +25,11 @@ namespace FileSystem
         //public byte[] data { get; private set; }
         //public long size { get { return data != null ? data.Length : 0; } }
         public short permissions;
-
         public SortedDictionary<string, FileNode> children;
         public long creationTime;
         public long modificationTime;
         protected MemoryStream memoryHandle;
-        protected int blockIndex;
+        public short blockIndex = -1;
 
         public bool isOpen { get { return memoryHandle != null; } }
 
@@ -111,7 +110,9 @@ namespace FileSystem
         {
             //data = data ?? new byte[0];
             memoryHandle = new MemoryStream();
-            //memoryHandle.Write(data, 0, data.Length);
+            byte[] data = FileSystem.instance.GetDataFromDisk(blockIndex);
+            memoryHandle.Write(data, 0, data.Length);
+            memoryHandle.Position = 0;
             modificationTime = DateTime.Now.ToBinary();
         }
 
@@ -121,6 +122,15 @@ namespace FileSystem
             {
                 byte[] data = Encoding.UTF8.GetBytes(_data);
                 memoryHandle.Write(data, 0, data.Length);
+            }
+        }
+
+        public void WriteAppend(string _data)
+        {
+            if (memoryHandle != null)
+            {
+                memoryHandle.Seek(0, SeekOrigin.End);
+                Write(_data);
             }
         }
 
@@ -157,6 +167,7 @@ namespace FileSystem
             if (memoryHandle != null)
             {
                 memoryHandle.Flush();
+                blockIndex = FileSystem.instance.SaveAtDisk(memoryHandle.ToArray(), blockIndex);
                 //data = memoryHandle.ToArray();
             }
         }

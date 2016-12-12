@@ -13,6 +13,8 @@ namespace FileSystem
         private const string FILESYSTEM_FILE = "files.dat";
         private const string SETTINGS_FILE = "settings.txt";
 
+        public static FileSystem instance;
+
         private Dictionary<string, Command> m_commands;
         public FileNode currentNode;
         private FileNode m_root;
@@ -21,6 +23,7 @@ namespace FileSystem
 
         public FileSystem()
         {
+            instance = this;
             Console.WriteLine("---------------------------------------------------------");
             Console.WriteLine("File System for SOA");
             Console.WriteLine("---------------------------------------------------------");
@@ -45,6 +48,7 @@ namespace FileSystem
             m_commands["write"] = new WriteCommand();
             m_commands["cat"] = new CatCommand();
             m_commands["mkdev"] = new MakeDeviceCommand();
+            m_commands["ap"] = new AppendCommand();
             //m_commands["open"] = new Command(OpenFile, CommandType.System);
             //m_commands["close"] = new Command(CloseFile, CommandType.File);
 
@@ -116,6 +120,7 @@ namespace FileSystem
                 fs.Close();
             }
             m_disk.Save();
+            m_disk.DebugFile();
         }
 
         private void LoadSettingsFile()
@@ -295,6 +300,8 @@ namespace FileSystem
                 return;
             }
 
+            m_disk.CleanBlocks(file.blockIndex);
+
             //Find parent node
             FileNode parent = null;
             string fileName = null;
@@ -377,14 +384,23 @@ namespace FileSystem
             }
         }
 
-        public int SaveAtDisk(byte[] _data)
+        public short SaveAtDisk(byte[] _data, short _refIndex)
         {
-            int[] blocks;
-            if(m_disk.WriteNewBlocks(_data, out blocks))
+            short[] blocks;
+            if(_refIndex == -1 && m_disk.WriteNewBlocks(_data, out blocks))
+            {
+                return blocks[0];
+            }
+            else if(_refIndex > -1 && m_disk.Reallocate(_refIndex, _data, out blocks))
             {
                 return blocks[0];
             }
             return -1;
+        }
+
+        public byte[] GetDataFromDisk(int _refIndex)
+        {
+            return m_disk.GetData(_refIndex);
         }
     }
 }

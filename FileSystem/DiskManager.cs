@@ -1,14 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 
 namespace FileSystem
 {
     public class DiskManager
     {
-        private const int BLOCK_HEADER_SIZE = 5;
-        private const int BLOCK_SIZE = 16;
+        private const int BLOCK_HEADER_SIZE = 3;
+        private const int BLOCK_SIZE = 8;
         private const int BLOCK_PAYLOAD_SIZE = BLOCK_SIZE - BLOCK_HEADER_SIZE;
-        private const int BLOCK_COUNT = 2048;
+        private const int BLOCK_COUNT = short.MaxValue;
+
+        private readonly static byte[] EMPTY_PAYLOAD = new byte[BLOCK_PAYLOAD_SIZE];
 
         private const string DISK_FILE = "disk.dat";
 
@@ -17,7 +20,7 @@ namespace FileSystem
         private BinaryWriter m_writer;
         private byte[] m_data;
 
-        private int m_lastAvailable = 0;
+        private short m_lastAvailable = 0;
 
         public DiskManager()
         {
@@ -25,9 +28,11 @@ namespace FileSystem
             m_dataContainer = new MemoryStream(m_data);
             m_reader = new BinaryReader(m_dataContainer);
             m_writer = new BinaryWriter(m_dataContainer);
-            int[] blocks;
-            WriteNewBlocks(new byte[6489], out blocks);
-            DebugFile();
+            //int[] blocks;
+            //WriteNewBlocks(new byte[1500], out blocks);
+            //DebugFile();
+            //Reallocate(blocks[0], new byte[305], out blocks);
+            //DebugFile("debug2.html");
         }
 
         public void Load()
@@ -50,7 +55,7 @@ namespace FileSystem
             return !m_reader.ReadBoolean();
         }
 
-        private void SetState(int _index, bool _state, int _next)
+        private void SetState(int _index, bool _state, short _next)
         {
             MoveTo(_index);
             m_writer.Write(_state);
@@ -62,19 +67,22 @@ namespace FileSystem
             m_dataContainer.Position = _index * BLOCK_SIZE;
         }
 
-        public bool WriteNewBlocks(byte[] _data, out int[] _allocated)
+        public bool WriteNewBlocks(byte[] _data, out short[] _allocated)
         {
             int blocks = CalculateBlockCount(_data.Length);
-            _allocated = new int[blocks];
+            if(blocks == 0)
+            {
+                blocks++;
+            }
+            _allocated = new short[blocks];
             int allocatedIndex = 0;
-            int initial = m_lastAvailable;
-            int current = m_lastAvailable;
-            int last = -1;
+            short initial = m_lastAvailable;
+            short current = m_lastAvailable;
+            short last = -1;
             do
             {
                 if (IsBlockAvailable(current))
                 {
-
                     _allocated[allocatedIndex++] = current;
                     m_lastAvailable = current;
                     if (last != -1)
@@ -105,22 +113,29 @@ namespace FileSystem
             return false;
         }
 
-        public bool Reallocate(int _startBlock, byte[] _data, out int[] _blocks)
+        public bool Reallocate(short _startBlock, byte[] _data, out short[] _blocks)
         {
             int blocks = CalculateBlockCount(_data.Length);
-            _blocks = new int[blocks];
-            
-            //Clean blocks
+            _blocks = new short[blocks];
 
             int allocatedIndex = 0;
-            int initial = m_lastAvailable;
-            int current = m_lastAvailable;
-            int last = -1;
+            short initial = _startBlock;
+            short current = _startBlock;
+            short last = -1;
+            bool lookingfornew = false;
             do
             {
-                if (IsBlockAvailable(current))
-                {
+                MoveTo(current);
+                bool available = m_reader.ReadBoolean();
+                short next = m_reader.ReadInt16();
 
+                if (available && !lookingfornew)
+                {
+                    _blocks[allocatedIndex++] = current;
+                    last = current;
+                }
+                else if (IsBlockAvailable(current))
+                {
                     _blocks[allocatedIndex++] = current;
                     m_lastAvailable = current;
                     if (last != -1)
@@ -129,7 +144,15 @@ namespace FileSystem
                     }
                     last = current;
                 }
-                current++;
+                if (available && next > -1)
+                {
+                    current = next;
+                }
+                else
+                {
+                    current++;
+                    lookingfornew = true;
+                }
                 if (current == BLOCK_COUNT)
                 {
                     current = 0;
@@ -137,9 +160,22 @@ namespace FileSystem
             }
             while (initial != current && allocatedIndex < _blocks.Length);
 
+            int toClean = -1;
             if (last != -1)
             {
+                MoveTo(last);
+                bool available = m_reader.ReadBoolean();
+                short next = m_reader.ReadInt16();
+                if (available && next > -1)
+                {
+                    toClean = next;
+                }
                 SetState(last, true, -1);
+            }
+
+            if (toClean > -1)
+            {
+                CleanBlocks(toClean);
             }
 
             if (allocatedIndex == _blocks.Length)
@@ -153,17 +189,28 @@ namespace FileSystem
 
         public void CleanBlocks(int _start)
         {
-
+            int current = _start;
+            int last = _start;
+            do
+            {
+                MoveTo(current);
+                m_reader.ReadBoolean();
+                current = m_reader.ReadInt16();
+                SetState(last, false, -1);
+                m_writer.Write(EMPTY_PAYLOAD);
+                last = current;
+            }
+            while (current > -1);
         }
 
-        private void Write(byte[] _data, int[] _blocks)
+        private void Write(byte[] _data, short[] _blocks)
         {
             int dataCounter = 0;
             for (int i = 0 ; i < _blocks.Length ; i++)
             {
                 MoveTo(_blocks[i]);
                 m_reader.ReadBoolean();
-                m_reader.ReadInt32();
+                m_reader.ReadInt16();
                 for (int z = 0 ; z < BLOCK_PAYLOAD_SIZE && dataCounter < _data.Length ; z++, dataCounter++)
                 {
                     m_dataContainer.WriteByte(_data[dataCounter]);
@@ -179,27 +226,48 @@ namespace FileSystem
             return blockCount;
         }
 
-        public void DebugFile()
+        public byte[] GetData(int _refIndex)
+        {
+            MemoryStream mem = new MemoryStream();
+            int current = _refIndex;
+            while(current > -1)
+            {
+                MoveTo(current);
+                bool good = m_reader.ReadBoolean();
+                short next = m_reader.ReadInt16();
+                byte[] payload = m_reader.ReadBytes(BLOCK_PAYLOAD_SIZE);
+                mem.Write(payload, 0, payload.Length);
+
+                if(good)
+                {
+                    current = next;
+                }
+            }
+
+            return mem.ToArray();
+        }
+
+        public void DebugFile(string file = "debug.html")
         {
             MoveTo(0);
-            FileStream fs = new FileStream("debug.html", FileMode.OpenOrCreate);
+            FileStream fs = new FileStream(file, FileMode.Create);
             StreamWriter writer = new StreamWriter(fs);
             int current = 0;
-            writer.WriteLine("<table>");
+            writer.WriteLine("<table border=\"1\">");
             for (; current < BLOCK_COUNT ;)
             {
                 writer.WriteLine("    <tr>");
-                for (int i = 0 ; i < 6 && current < BLOCK_COUNT ; i++, current++)
+                for (int i = 0 ; i < 8 && current < BLOCK_COUNT ; i++, current++)
                 {
                     MoveTo(current);
                     byte[] data = m_reader.ReadBytes(BLOCK_SIZE);
-                    string str = "";
-                    for(int s = 0 ; s < data.Length ; s++)
+                    string str = "" + BitConverter.ToBoolean(data, 0) + "," + BitConverter.ToInt16(data, 1) + ",";
+                    for (int s = 5 ; s < data.Length ; s++)
                     {
                         str += "" + data[s];
                     }
                     writer.WriteLine("        <td>");
-                    writer.WriteLine("            |" + str + "|");
+                    writer.WriteLine("            " + str + "");
                     writer.WriteLine("        </td>");
                 }
                 writer.WriteLine("    </tr>");

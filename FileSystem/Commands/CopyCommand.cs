@@ -15,7 +15,7 @@
             string source = _args[0];
             string destin = _args[1];
 
-            FileNode sourceFile = fileSystem.FindNode(source);
+            FileNode sourceFile = fileSystem.Open(source, false);
             FileNode destinFile = fileSystem.FindNode(destin);
 
             if (sourceFile == null)
@@ -31,8 +31,9 @@
             }
 
             destinFile = fileSystem.Open(destin);
-            //destinFile.Write(sourceFile.data);
+            destinFile.Write(sourceFile.ReadAll());
             fileSystem.Close(destinFile);
+            fileSystem.Close(sourceFile);
 
             return true;
         }
