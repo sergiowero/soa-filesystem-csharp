@@ -8,10 +8,10 @@ namespace FileSystem.Commands
         {
             foreach (var node in fileSystem.currentNode.children)
             {
-		if(node.Value != null)
-		{
-                	Console.WriteLine(string.Format(" {0,-30}  {1:-40}  {2}", node.Key, node.Value.PrintTime(), node.Value.PrintPermissions()));
-		}
+                if (node.Value != null)
+                {
+                    Console.WriteLine(string.Format(" {0,-30}  {1:-40}  {2}", node.Key, node.Value.PrintTime(), node.Value.PrintPermissions()));
+                }
             }
             return true;
         }

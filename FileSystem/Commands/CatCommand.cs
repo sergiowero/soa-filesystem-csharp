@@ -22,7 +22,7 @@ namespace FileSystem.Commands
                 Console.WriteLine(file.ReadAll());
                 fileSystem.Close(file);
             }
-            
+
             return true;
         }
     }

@@ -31,7 +31,7 @@
             }
 
             destinFile = fileSystem.Open(destin);
-            destinFile.Write(sourceFile.data);
+            //destinFile.Write(sourceFile.data);
             fileSystem.Close(destinFile);
 
             return true;

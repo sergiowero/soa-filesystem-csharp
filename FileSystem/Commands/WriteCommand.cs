@@ -1,7 +1,6 @@
-﻿
-namespace FileSystem.Commands
+﻿namespace FileSystem.Commands
 {
-    public class WriteCommand :  Command
+    public class WriteCommand : Command
     {
         public override bool saveSystemAfterExecute { get { return true; } }
 
@@ -17,14 +16,13 @@ namespace FileSystem.Commands
 
             if (file != null)
             {
-
                 string data = string.Join(" ", _args, 1, _args.Length - 1);
 
                 file.Write(data);
 
                 fileSystem.Close(file);
             }
-            
+
             return true;
         }
     }

@@ -17,6 +17,7 @@ namespace FileSystem
         public FileNode currentNode;
         private FileNode m_root;
         public Dictionary<string, string> settings;
+        private DiskManager m_disk;
 
         public FileSystem()
         {
@@ -71,6 +72,9 @@ namespace FileSystem
                 }
             }
 
+            m_disk = new DiskManager();
+            m_disk.Load();
+
             if (m_root == null)
             {
                 m_root = new FileNode(FileNode.Type.Directory)
@@ -111,6 +115,7 @@ namespace FileSystem
             {
                 fs.Close();
             }
+            m_disk.Save();
         }
 
         private void LoadSettingsFile()
@@ -224,13 +229,13 @@ namespace FileSystem
             return result;
         }
 
-        public FileNode Open(string name, bool _createIfNotExist=true)
+        public FileNode Open(string name, bool _createIfNotExist = true)
         {
             FileNode file = FindNode(name, currentNode);
 
             if (file == null)
             {
-                if(!_createIfNotExist)
+                if (!_createIfNotExist)
                 {
                     SysLog.LogError("File {0} does not exist", name);
                     return null;
@@ -339,7 +344,7 @@ namespace FileSystem
                     SysLog.LogError("Path \"{0}\" is invalid.", _name);
                 }
 
-                switch(_type)
+                switch (_type)
                 {
                     case "zero":
                         file = new ZeroDevice()
@@ -351,6 +356,7 @@ namespace FileSystem
                             modificationTime = DateTime.Now.ToBinary()
                         };
                         break;
+
                     case "mouse":
                         file = new MouseDevice()
                         {
@@ -361,14 +367,24 @@ namespace FileSystem
                             modificationTime = DateTime.Now.ToBinary()
                         };
                         break;
+
                     default:
                         SysLog.LogError("Device type {0} does not exist", _type);
                         break;
                 }
 
                 parent[fileName] = file;
-                
             }
+        }
+
+        public int SaveAtDisk(byte[] _data)
+        {
+            int[] blocks;
+            if(m_disk.WriteNewBlocks(_data, out blocks))
+            {
+                return blocks[0];
+            }
+            return -1;
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.IO;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace FileSystem.Devices
 {
@@ -18,12 +16,15 @@ namespace FileSystem.Devices
             this.Y = y;
         }
     }
+
     [Serializable]
     public class MouseDevice : FileNode
     {
 #if WINDOWS
+
         [DllImport("user32.dll")]
-        static extern bool GetCursorPos(out POINT lpPoint);
+        private static extern bool GetCursorPos(out POINT lpPoint);
+
 #endif
 
 #if LINUX
@@ -52,20 +53,18 @@ namespace FileSystem.Devices
         }
 #endif
 
-        public MouseDevice() :base(Type.Device)
+        public MouseDevice() : base(Type.Device)
         {
         }
 
         public override void Open()
         {
-
         }
 
         public override string ReadAll()
         {
             POINT point;
             GetCursorPos(out point);
-
 
             return string.Format("{0},{1}", point.X, point.Y);
         }
@@ -84,7 +83,7 @@ namespace FileSystem.Devices
             byte[] source = memoryHandle.ToArray();
             memoryHandle = null;
 
-            for (int i = offset, c = 0 ; i < _buff.Length && c < count && c < source.Length; i++, c++)
+            for (int i = offset, c = 0 ; i < _buff.Length && c < count && c < source.Length ; i++, c++)
             {
                 _buff[i] = source[c];
             }
@@ -92,7 +91,6 @@ namespace FileSystem.Devices
 
         public override void Write(string _data)
         {
-
         }
     }
 }

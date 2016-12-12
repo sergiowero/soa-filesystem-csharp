@@ -21,13 +21,16 @@ namespace FileSystem
         public Type type { get; private set; }
         public string absolutePath;
         public string relativePath;
-        public byte[] data { get; private set; }
-        public long size { get { return data != null ? data.Length : 0; } }
+
+        //public byte[] data { get; private set; }
+        //public long size { get { return data != null ? data.Length : 0; } }
         public short permissions;
+
         public SortedDictionary<string, FileNode> children;
         public long creationTime;
         public long modificationTime;
         protected MemoryStream memoryHandle;
+        protected int blockIndex;
 
         public bool isOpen { get { return memoryHandle != null; } }
 
@@ -106,9 +109,9 @@ namespace FileSystem
 
         public virtual void Open()
         {
-            data = data ?? new byte[0];
+            //data = data ?? new byte[0];
             memoryHandle = new MemoryStream();
-            memoryHandle.Write(data, 0, data.Length);
+            //memoryHandle.Write(data, 0, data.Length);
             modificationTime = DateTime.Now.ToBinary();
         }
 
@@ -135,7 +138,7 @@ namespace FileSystem
 
         public virtual void Read(byte[] _buff, int offset, int count)
         {
-            if(memoryHandle != null && _buff != null)
+            if (memoryHandle != null && _buff != null)
             {
                 memoryHandle.Read(_buff, offset, count);
             }
@@ -154,7 +157,7 @@ namespace FileSystem
             if (memoryHandle != null)
             {
                 memoryHandle.Flush();
-                data = memoryHandle.ToArray();
+                //data = memoryHandle.ToArray();
             }
         }
 

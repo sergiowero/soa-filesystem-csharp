@@ -59,6 +59,7 @@
     <Compile Include="Commands\WriteCommand.cs" />
     <Compile Include="Devices\MouseDevice.cs" />
     <Compile Include="Devices\ZeroDevice.cs" />
+    <Compile Include="DiskManager.cs" />
     <Compile Include="FileNode.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="Program.cs" />
